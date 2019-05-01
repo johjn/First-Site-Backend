@@ -29,13 +29,30 @@ var config = {
   }
   
   var pool = new pg.Pool(config)
-
+              
   // GET
-router.get('/test', async(ctx) =>{
+router.get('/info', async(ctx) =>{
    await pool.connect()
   .then(()=>pool.query('select * from "angajati"'))
   .then(results => ctx.body = results.rows)
   .catch(e => ctx.body =e)
+
+}) 
+
+router.get('/info/:id', async(ctx) =>{
+  await pool.connect()
+ .then(()=>pool.query(`select * from "angajati" where id_angajati = ${ctx.params.id}`))
+ .then(results => ctx.body = results.rows)
+ .catch(e => ctx.body =e)
+
+}) 
+
+router.delete('/delete/:id', async(ctx) =>{
+  console.log(ctx)
+  /*await pool.connect()
+ .then(()=>pool.query('delete from "angajati" where id_angajati ="1"'))
+ .then(results => ctx.body = results.rows)
+ .catch(e => ctx.body =e)*/
 
 }) 
 
