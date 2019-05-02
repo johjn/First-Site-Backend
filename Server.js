@@ -30,34 +30,61 @@ var config = {
   
   var pool = new pg.Pool(config)
               
-  // GET
+  // GET (select all from database)
 router.get('/info', async(ctx) =>{
-   await pool.connect()
-  .then(()=>pool.query('select * from "angajati"'))
-  .then(results => ctx.body = results.rows)
-  .catch(e => ctx.body =e)
-
+   try {
+     await pool.connect();
+     const result = await pool.query('select * from "angajati"');
+     ctx.body = result.rows;
+   } catch(err) {
+     ctx.status = err.status || 500;
+     ctx.body = err.message;
+   }
 }) 
 
+// GET (select all from database with id)
 router.get('/info/:id', async(ctx) =>{
-  await pool.connect()
- .then(()=>pool.query(`select * from "angajati" where id_angajati = ${ctx.params.id}`))
- .then(results => ctx.body = results.rows)
- .catch(e => ctx.body =e)
-
+   try {
+     await pool.connect()
+     const result = await pool.query(`select * from "angajati" where id_angajati = ${ctx.params.id}`)
+     ctx.body = result.rows
+   } catch(err) {
+     ctx.status = err.status || 500;
+     ctx.body = err.message;
+   }
 }) 
 
+// PUT (update date in database)
+router.put('/update/:id', async(ctx) =>{
+   try {
+     await pool.connect()
+     const result = await pool.query(`update "angajati" set name = '${ctx.request.body.name}',
+                                                        lastname = '${ctx.request.body.lsname}',
+                                                          salary =  ${ctx.request.body.sal}
+                                              where id_angajati =  ${ctx.params.id}`)
+     ctx.body = result.rows
+   } catch(err) {
+     ctx.status = err.status || 500;
+     ctx.body = err.message;
+   }
+}) 
+
+//DELETE (delete date from database with id)
 router.delete('/delete/:id', async(ctx) =>{
-  console.log(ctx)
-  /*await pool.connect()
- .then(()=>pool.query('delete from "angajati" where id_angajati ="1"'))
- .then(results => ctx.body = results.rows)
- .catch(e => ctx.body =e)*/
-
+  try {
+    await pool.connect()
+    const result = await pool.query(`delete from "angajati" where id_angajati = ${ctx.params.id}`)
+    ctx.body = result.rows
+  } catch(err) {
+    ctx.status = err.status || 500;
+    ctx.body = err.message;
+  }
 }) 
 
-   pool.connect(function (err) {
+//Conection databasse
+pool.connect(function (err) {
     if (err) console.log(err)
     app.listen(3000, function () {
-      console.log('listening on 3000')
-    })})
+    console.log('listening on 3000')
+    })
+})
