@@ -33,8 +33,7 @@ var config = {
   // GET (select all from database)
 router.get('/info', async(ctx) =>{
    try {
-     await pool.connect();
-     const result = await pool.query('select * from "angajati"');
+     const result = await pool.query('select * from "angajati" order by lastname');
      ctx.body = result.rows;
    } catch(err) {
      ctx.status = err.status || 500;
@@ -45,7 +44,6 @@ router.get('/info', async(ctx) =>{
 // GET (select all from database with id)
 router.get('/info/:id', async(ctx) =>{
    try {
-     await pool.connect()
      const result = await pool.query(`select * from "angajati" where id_angajati = ${ctx.params.id}`)
      ctx.body = result.rows
    } catch(err) {
@@ -54,10 +52,25 @@ router.get('/info/:id', async(ctx) =>{
    }
 }) 
 
+// POST (insert date in database)
+router.post('/insert', async(ctx) =>{
+  console.log(ctx.request.body.lsname)
+  try {
+    const result = await pool.query(`insert into "angajati" (name,lastname,salary)
+                                                   values ('${ctx.request.body.name}',
+                                                           '${ctx.request.body.lsname}',
+                                                            ${ctx.request.body.sal})`)
+                                            
+    ctx.body = result.rows
+  } catch(err) {
+    ctx.status = err.status || 500;
+    ctx.body = err.message;
+  }
+}) 
+
 // PUT (update date in database)
 router.put('/update/:id', async(ctx) =>{
    try {
-     await pool.connect()
      const result = await pool.query(`update "angajati" set name = '${ctx.request.body.name}',
                                                         lastname = '${ctx.request.body.lsname}',
                                                           salary =  ${ctx.request.body.sal}
@@ -72,7 +85,6 @@ router.put('/update/:id', async(ctx) =>{
 //DELETE (delete date from database with id)
 router.delete('/delete/:id', async(ctx) =>{
   try {
-    await pool.connect()
     const result = await pool.query(`delete from "angajati" where id_angajati = ${ctx.params.id}`)
     ctx.body = result.rows
   } catch(err) {
